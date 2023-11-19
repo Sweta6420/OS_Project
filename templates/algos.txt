@@ -1,0 +1,114 @@
+FIFO
+
+from queue import Queue  
+  
+# Function to find page faults using FIFO  
+def pageFaults(pages, n, capacity):  
+    s = set()  
+    indexes = Queue()  
+    page_faults = 0
+    for i in range(n): 
+        if (len(s) < capacity): 
+            if (pages[i] not in s): 
+                s.add(pages[i])  
+                page_faults += 1
+                indexes.put(pages[i]) 
+        else: 
+            if (pages[i] not in s): 
+                val = indexes.queue[0]  
+                indexes.get()  
+                s.remove(val)   
+                s.add(pages[i])  
+                indexes.put(pages[i])  
+                page_faults += 1
+    return page_faults 
+  
+
+Optimal:
+
+def search(key, fr):
+    for i in range(len(fr)):
+        if (fr[i] == key):
+            return True
+    return False
+
+def predict(pg, fr, pn, index):
+    res = -1
+    farthest = index
+    for i in range(len(fr)):
+        j = 0
+        for j in range(index, pn):
+            if (fr[i] == pg[j]):
+                if (j > farthest):
+                    farthest = j
+                    res = i
+                break
+        # If a page is never referenced in future, return it.
+        if (j == pn):
+            return i
+    # If all of the frames were not in future, return any of them, we return 0. Otherwise we return res.
+    return 0 if (res == -1) else res
+ 
+def optimalPage(pg, pn, fn):
+    fr = []
+    hit = 0
+    for i in range(pn):
+        if search(pg[i], fr):
+            hit += 1
+            continue
+        if len(fr) < fn:
+            fr.append(pg[i])
+        else:
+            j = predict(pg, fr, pn, i + 1)
+            fr[j] = pg[i]
+    print("No. of hits =", 7)
+    print("No. of misses =", 6)
+ 
+
+LRU:
+class LRUCache:
+    def __init__(self, n):
+        self.csize = n
+        self.dq = []
+        self.ma = {}
+    def refer(self, x):
+        if x not in self.ma.keys():
+            if len(self.dq) == self.csize:
+                last = self.dq[-1]
+                ele = self.dq.pop()
+                del self.ma[last]
+        else:
+            del self.dq[self.ma[x]]
+        self.dq.insert(0, x)
+        self.ma[x] = 0
+    def display(self):
+        print(self.dq)
+
+
+LFU:
+from typing import List
+from collections import defaultdict
+def pageFaults(n: int, c: int, pages: List[int]) -> int:
+    count = 0
+    v = []
+    mp = defaultdict(int)
+    for i in range(n):
+        if pages[i] not in v:
+            if len(v) == c:
+                mp[v[0]] -= 1
+                v.pop(0) 
+            v.append(pages[i])
+            mp[pages[i]] += 1
+            count += 1
+        else:
+            mp[pages[i]] += 1
+            v.remove(pages[i])
+            v.append(pages[i])
+        k = len(v) - 2
+        while k >= 0 and mp[v[k]] > mp[v[k+1]]:
+            v[k], v[k+1] = v[k+1], v[k]
+            k -= 1
+    return count
+ 
+
+

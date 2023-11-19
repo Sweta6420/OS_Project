@@ -3,25 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles.css') }}">
     <title>Supermarket Website</title>
 </head>
-<body>
-    <h1>Supermarket Website</h1>
-    
-    <h2>Available Products</h2>
+<body id="cont">
+    <h2 id="home-title">Supermarket Website</h2>
+    <h2>Available Products ..which one do you want?</h2>
     <form action="{{ url_for('replace') }}" method="post">
         <ul>
             {% for product in products %}
-                <li>{{ product }} <button type="submit" name="product" value="{{ product }}">Replace</button></li>
+                <li id="inv-list">{{ product }} <button id="replace-btn" type="submit" name="product" value="{{ product }}">Select</button></li>
             {% endfor %}
         </ul>
     </form>
+    {% if showalgos==1 %}
+        <h2>Pick Algorithm</h2>
+        <form id="btn-form" method="post">
+            <button id="algo-btn" type="submit" name="algo" value="FIFO">FIFO</button>
+            <button id="algo-btn" type="submit" name="algo" value="Optimal">Optimal</button>
+            <button id="algo-btn" type="submit" name="algo" value="LRU">LRU</button>
+            <button id="algo-btn" type="submit" name="algo" value="LFU">LFU</button> 
+        </form>
+    {% endif %}
+    {% if showalgos==0 %}
+        <form id="btn-form" action="/" method="post">
+            <button id="algo-btn" type="submit" value="FIFO">HOME</button>
+        </form>
+    {% endif %}
+    {% if algo %}
+        <h2>Selected Algorithm - {{algo}}</h2>
+    {% endif %}
 
-    <h2>Displayed Products</h2>
-    <ul>
-        {% for product in display_queue %}
-            <li>{{ product }}</li>
+    <h2>Displayed Products - Shelf Space : {{max_display}}</h2>
+    <div class="stuffonshelf">
+        Product - 
+        {% for product in display %}
+            <div>{{ product["name"] }}</div>
         {% endfor %}
-    </ul>
+    </div>
+    <div class="stuffonshelf">
+        Lru cnt - 
+        {% for product in display %}
+            <div>{{ product["lrucount"] }}</div>
+        {% endfor %}
+    </div>
+    <div class="stuffonshelf">
+        Freq cnt - 
+        {% for product in display %}
+            <div>{{ product["lfucount"] }}</div>
+        {% endfor %}
+    </div>
+    <div class="shelf"></div>
+    {% if showalgos==0 %}
+        <div class="stuffonshelf">
+            <div>Hits - {{hits}}</div>
+        </div>
+        <div class="stuffonshelf">
+            <div>Faults - {{faults}}</div>
+        </div>
+    {% endif %}  
 </body>
 </html>
